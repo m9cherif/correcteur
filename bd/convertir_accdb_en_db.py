@@ -171,7 +171,8 @@ def exporter_db(tables, out_dossier, nom_base, requetes=None):
     for nom_t, td in tables.items():
         cols = list(td["champs"])
         d = td.get("_data") or {}
-        ins = (f'INSERT INTO "{nom_t}" ({", ".join(f"\"{c}\"" for c in cols)}) '
+        cols_sql = ", ".join('"%s"' % c for c in cols)
+        ins = (f'INSERT INTO "{nom_t}" ({cols_sql}) '
                f'VALUES ({", ".join("?" * len(cols))})')
         for i in range(td["lignes"]):
             vals = []

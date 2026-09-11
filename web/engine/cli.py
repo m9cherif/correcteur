@@ -55,6 +55,37 @@ try:
 except Exception:
     ca = None
 
+# Pure-Python .accdb -> .db fallback (access_parser, no Windows ACE/pyodbc
+# needed) so Access comparison also works on a Linux server. Used only when
+# not on Windows; on Windows correcteur_access already reads .accdb natively
+# via pyodbc with full fidelity (including saved queries).
+try:
+    sys.path.insert(0, os.path.join(PROJECT_ROOT, "bd"))
+    import convertir_accdb_en_db as accdb_conv
+except Exception:
+    accdb_conv = None
+
+_ACCDB_DB_CACHE = {}
+
+
+def _resolve_bd_path(path, tmp_dir):
+    """Retourne un chemin .db utilisable par correcteur_access.comparer,
+    convertissant un .accdb/.mdb à la volée (pure Python) si nécessaire."""
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in (".accdb", ".mdb") or os.name == "nt":
+        return path
+    if path in _ACCDB_DB_CACHE:
+        return _ACCDB_DB_CACHE[path]
+    if accdb_conv is None:
+        raise RuntimeError(
+            "Comparaison .accdb non disponible sur ce serveur (module "
+            "access_parser manquant : pip install access_parser). "
+            "Convertissez en SQLite (.db) pour une comparaison portable.")
+    out, _tables = accdb_conv.convertir(path, tmp_dir)
+    _ACCDB_DB_CACHE[path] = out
+    return out
+
+
 try:
     import rapport_excel
 except Exception:
@@ -442,21 +473,21 @@ def cmd_bd_comparer(p):
     solution_path = p["solution_path"]
     fichiers = p.get("fichiers", [])  # [{nom, path}]
     resultats = []
+    tmp_dir = tempfile.mkdtemp(prefix="accdb2sqlite_")
     try:
+        try:
+            solution_db = _resolve_bd_path(solution_path, tmp_dir)
+        except Exception as e:
+            _out({"resultats": [{"nom": os.path.basename(solution_path),
+                                  "ok": False, "erreur": str(e)}],
+                  "stats": {"n": 0, "n_ok": 0, "moyenne": 0}})
+            return
         for entry in fichiers:
             nom = entry.get("nom") or os.path.basename(entry["path"])
             path = entry["path"]
-            ext = os.path.splitext(path)[1].lower()
-            if ext in (".accdb", ".mdb") and os.name != "nt":
-                resultats.append({
-                    "nom": nom, "ok": False,
-                    "erreur": "Comparaison .accdb non disponible sur ce serveur "
-                              "(pilotes Access/ACE Windows requis). Convertissez "
-                              "en SQLite (.db) pour une comparaison portable.",
-                })
-                continue
             try:
-                r = ca.comparer(path, solution_path)
+                db_path = _resolve_bd_path(path, tmp_dir)
+                r = ca.comparer(db_path, solution_db)
                 resultats.append({"nom": nom, "ok": True, "rapport": r})
             except Exception as e:
                 resultats.append({"nom": nom, "ok": False,
@@ -466,6 +497,8 @@ def cmd_bd_comparer(p):
                  "moyenne": round(sum(notes) / len(notes), 2) if notes else 0}
         _out({"resultats": resultats, "stats": stats})
     finally:
+        import shutil
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         try:
             ca.fermer_connexions()
         except Exception:
@@ -483,17 +516,22 @@ def cmd_bd_export_excel(p):
     out_path = p["out_path"]
     fichiers = p.get("fichiers", [])
     rapports = []
+    tmp_dir = tempfile.mkdtemp(prefix="accdb2sqlite_")
     try:
+        solution_db = _resolve_bd_path(solution_path, tmp_dir)
         for entry in fichiers:
             nom = entry.get("nom") or os.path.basename(entry["path"])
             try:
-                r = ca.comparer(entry["path"], solution_path)
+                db_path = _resolve_bd_path(entry["path"], tmp_dir)
+                r = ca.comparer(db_path, solution_db)
                 rapports.append((nom, r))
             except Exception:
                 pass
-        path = ca.exporter_excel(out_path, rapports, solution_path)
+        path = ca.exporter_excel(out_path, rapports, solution_db)
         _out({"path": path})
     finally:
+        import shutil
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         try:
             ca.fermer_connexions()
         except Exception:
