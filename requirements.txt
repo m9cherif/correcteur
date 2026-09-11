@@ -1,0 +1,13 @@
+# Dépendances Python du moteur de correction (web/engine/cli.py et modules
+# analyseur/correcteur/correcteur_access/rapport_excel).
+#
+# PyQt5, pyodbc et win32com ne sont PAS listés : ils ne servent qu'à
+# l'app desktop / à l'accès Access via pilotes Windows, absents du
+# déploiement web (Linux).
+openpyxl>=3.1
+access-parser>=0.0.6
+
+# Note d'installation : sur certains systèmes (Debian/Ubuntu avec
+# distutils patché + setuptools récent), le build sdist de access-parser
+# échoue avec "AttributeError: install_layout". Contournement :
+#   SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
