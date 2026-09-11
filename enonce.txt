@@ -1,0 +1,9 @@
+TP n°3 — Gestion des notes d'une classe
+=======================================
+Écrire trois fonctions :
+
+1) moyenne(notes)        → moyenne des notes (0 si la liste est vide)
+2) mention(moy)          → "Excellent" ≥16, "Bien" ≥14, "Passable" ≥10, sinon "Insuffisant"
+3) admis(notes, seuil)   → True si la moyenne est ≥ seuil (seuil = 10 par défaut)
+
+Contraintes : aucune bibliothèque externe, pas de plantage sur une liste vide.

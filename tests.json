@@ -1,0 +1,11 @@
+[
+  {"fonction": "moyenne", "args": [[12, 15, 9]],  "nom": "moyenne([12,15,9])"},
+  {"fonction": "moyenne", "args": [[]],           "nom": "moyenne([]) — liste vide"},
+  {"fonction": "moyenne", "args": [[20]],         "nom": "moyenne([20]) — une seule note"},
+  {"fonction": "mention", "args": [17],           "nom": "mention(17)"},
+  {"fonction": "mention", "args": [14],           "nom": "mention(14) — borne exacte"},
+  {"fonction": "mention", "args": [9.5],          "nom": "mention(9.5)"},
+  {"fonction": "admis",   "args": [[8, 9], 10],   "nom": "admis([8,9], 10)"},
+  {"fonction": "admis",   "args": [[10, 10], 10], "nom": "admis([10,10], 10) — seuil exact"},
+  {"fonction": "admis",   "args": [[14, 16], 10], "nom": "admis([14,16], 10)"}
+]

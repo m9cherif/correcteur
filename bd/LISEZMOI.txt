@@ -1,0 +1,73 @@
+Dossier bd/ — TP « Base de données » prêt à l'emploi
+====================================================
+  enonce_bd.txt   sujet distribué aux élèves
+  sql/            le code SQL de chaque copie (lisible, modifiable)
+                  00_solution.sql = corrigé du professeur
+  creer_bases.py  reconstruit solution.db et classe/*.db à partir de sql/
+  solution.db     base de référence (version .db, corrigeable partout)
+  solution.accdb  base Access VIDE de départ (la solution réelle en .accdb
+                  se construit avec accdb_sql/solution.accdb.sql — voir plus bas)
+  classe/         7 copies d'élèves (.db)
+
+CORRIGER
+  Interface   : correcteur_app.py → menu 🗄 BD → solution + dossier → ▶
+  Ligne cmd   : python correcteur_access.py bd/classe -s bd/solution.db \
+                       --excel rapport_bd.xlsx --lang fr
+
+NOTES ATTENDUES
+  06_nour    20.00  copie parfaite
+  07_hedi    18.87  champs renommés (Nom_Eleve) + Adresse en trop, données Eleve
+                    différentes, requêtes correctes
+  01_sami    18.67  tout bon, requête R3 non créée
+  03_khalil  18.20  dates en texte, Note sans clé primaire, données Note
+                    différentes
+  04_ines    16.44  structure et données parfaites, 3 requêtes fausses
+  05_walid   12.67  table Matiere absente → relation + requête impossibles
+  02_rania   10.04  pas de clé, date texte, champ manquant, 0 relation,
+                    données différentes, 2 requêtes fausses
+  → Moyenne 16.41 / 20
+
+Les notes dépendent du barème bd des axes_champs/axes_donnees
+(Tables 4 · Champs 4 · Données 2 · Clés 2 · Relations 4 · Requêtes 4).
+
+PASSER À ACCESS (.accdb)
+  1. Access ▸ Créer une base vide ▸ enregistrer en .accdb
+  2. Créer ▸ Création de requête ▸ fermer l'assistant ▸ bouton « Mode SQL »
+  3. Coller UNE instruction du fichier sql/ à la fois puis Exécuter (!)
+     (Access exécute une seule instruction par requête)
+  4. Les CREATE VIEW deviennent des requêtes enregistrées : donnez-leur
+     exactement le nom R1_MoyenneParEleve, R2_ElevesEnEchec, R3_NotesInformatique
+  5. Les relations : onglet Outils de base de données ▸ Relations ▸ glisser
+     IdEleve vers Note.IdEleve, cocher « Appliquer l'intégrité référentielle »
+  6. Corriger ensuite normalement : la lecture .accdb exige
+     pip install pyodbc + moteur ACE (Windows), ou mdbtools (Linux)
+
+OBTENIR DES ESSAIS .ACCDB RÉELS
+-------------------------------
+Les copies sont fournies en .db (SQLite) car ce format se lit sur tout système.
+Pour les convertir en vrais fichiers Access :
+
+  VOTRE SOLUTION EN .ACCDB (binaire).
+  accdb_sql/solution.accdb.sql : la solution complète prête à coller en
+  Access (3 tables + données + 2 relations + 3 requêtes R1/R2/R3).
+  Une fois collée et enregistrée dans Access, vous obtenez le VRAI
+  solution.accdb corrigeable : python correcteur_access.py ... -s solution.accdb
+
+  A) Sur Windows avec Access installé — conversion automatique
+       pip install pyodbc msaccessdb
+       python convertir_en_accdb.py . -o bd_accdb
+     → bd_accdb/solution.accdb + 7 copies .accdb (tables, données,
+       relations avec intégrité référentielle, requêtes R1/R2/R3)
+     puis :
+       python correcteur_access.py bd_accdb -s bd_accdb/solution.accdb --lang fr
+
+  B) Sans moteur ACE — scripts SQL à coller (voie « A » ci-dessus impossible)
+       python convertir_en_accdb.py . -o accdb_sql --sql-seulement
+     → accdb_sql/*.accdb.sql (déjà générés dans ce dossier)
+     Dans Access : Créer ▸ Création de requête ▸ fermer l'assistant ▸
+     bouton « Mode SQL » ▸ coller UNE instruction ▸ Exécuter (!)
+     Le SQL est déjà adapté au dialecte Jet : AUTOINCREMENT, TEXT(n), LONG,
+     DOUBLE, DATETIME, dates entre #…#, INNER JOIN, alias AS, GROUP BY complet.
+
+  modele_vide.accdb / solution.accdb : bases Access vides (fournies par
+  msaccessdb) si vous voulez partir d'un fichier .accdb neuf sans ouvrir Access.

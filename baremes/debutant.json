@@ -1,0 +1,94 @@
+{
+  "nom": "Débutant (indulgent)",
+  "description": "Début d'année : le style n'est pas encore sanctionné.",
+  "note_max": 20.0,
+  "arrondi": 2,
+  "tolerance": 3,
+  "erreur_fatale": false,
+  "axes": {
+    "qualite": 3.0,
+    "tests": 13.0,
+    "structure": 4.0
+  },
+  "axes_bd": {
+    "tables": 4.0,
+    "champs": 6.0,
+    "cles": 2.0,
+    "relations": 4.0,
+    "requetes": 4.0
+  },
+  "seuils": [
+    16,
+    14,
+    12,
+    10,
+    8
+  ],
+  "regles": {
+    "E001": {
+      "actif": true,
+      "penalite": 4.0,
+      "plafond": 4.0
+    },
+    "E002": {
+      "actif": true,
+      "penalite": 4.0,
+      "plafond": 4.0
+    },
+    "E102": {
+      "actif": true,
+      "penalite": 1.5,
+      "plafond": 3.0
+    },
+    "E104": {
+      "actif": true,
+      "penalite": 1.5,
+      "plafond": 3.0
+    },
+    "E108": {
+      "actif": true,
+      "penalite": 1.0,
+      "plafond": 2.0
+    },
+    "W101": {
+      "actif": false,
+      "penalite": 0.75,
+      "plafond": 2.25
+    },
+    "W110": {
+      "actif": false,
+      "penalite": 0.75,
+      "plafond": 2.25
+    },
+    "W103": {
+      "actif": false,
+      "penalite": 0.5,
+      "plafond": 1.5
+    },
+    "W105": {
+      "actif": false,
+      "penalite": 0.5,
+      "plafond": 1.5
+    },
+    "W106": {
+      "actif": false,
+      "penalite": 0.5,
+      "plafond": 1.5
+    },
+    "W111": {
+      "actif": false,
+      "penalite": 0.5,
+      "plafond": 1.5
+    },
+    "W107": {
+      "actif": false,
+      "penalite": 0.25,
+      "plafond": 1.0
+    },
+    "W109": {
+      "actif": false,
+      "penalite": 0.125,
+      "plafond": 1.0
+    }
+  }
+}

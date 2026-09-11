@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Correcteur — Web</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>🐍 Correcteur — TP Python</h1>
+  <select id="selLang">
+    <option value="fr">Français</option>
+    <option value="ar">العربية</option>
+    <option value="en">English</option>
+  </select>
+  <select id="selTheme">
+    <option value="light">Clair</option>
+    <option value="dark">Sombre</option>
+  </select>
+</header>
+
+<nav class="tabs">
+  <button data-tab="tp" class="active">📁 TP</button>
+  <button data-tab="copie">📝 Copie</button>
+  <button data-tab="correction">✅ Correction</button>
+  <button data-tab="bareme">⚖ Barème</button>
+  <button data-tab="classe">📚 Classe</button>
+  <button data-tab="bd">🗄 BD</button>
+  <button data-tab="interp">🐍 Interpréteurs</button>
+  <button data-tab="galerie">🌐 Galerie publique</button>
+  <button data-tab="affichage">🎨 Affichage</button>
+</nav>
+
+<main>
+
+  <!-- TP -->
+  <section class="tabpane active" id="tab-tp">
+    <div class="card">
+      <h2>Configuration du TP</h2>
+      <p class="muted">Utilisez les fichiers de démonstration du projet, ou envoyez les vôtres (solution.py / tests.json / barème). Les fichiers envoyés sont enregistrés et listés publiquement dans l'onglet Galerie.</p>
+      <div class="row">
+        <button id="btnDemo" class="primary">Charger la démo du projet</button>
+      </div>
+      <div id="tpInfo" class="muted" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h2>Envoyer mes propres fichiers</h2>
+      <label>solution.py</label>
+      <input type="file" id="fileSolution" accept=".py">
+      <label>tests.json (optionnel)</label>
+      <input type="file" id="fileTests" accept=".json">
+      <label>barème JSON (optionnel)</label>
+      <input type="file" id="fileBareme" accept=".json">
+      <div class="row" style="margin-top:10px">
+        <button id="btnUploadTp" class="primary">Envoyer (public)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Copie -->
+  <section class="tabpane" id="tab-copie">
+    <div class="grid2">
+      <div class="card">
+        <h2>Copie de l'élève</h2>
+        <label>Nom du fichier</label>
+        <input type="text" id="copieNom" value="copie.py" style="width:100%">
+        <label>Code source</label>
+        <textarea id="copieSource" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button id="btnOpenFile" >Ouvrir un fichier…</button>
+          <input type="file" id="fileCopie" accept=".py" style="display:none">
+          <button id="btnAnalyser" class="primary">🔍 Analyser</button>
+          <button id="btnExecuter">▶ Exécuter</button>
+          <button id="btnExportAnnote">💾 Export annoté (.py)</button>
+          <button id="btnPrint">🖨 Imprimer / PDF</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Sortie d'exécution</h2>
+        <pre class="diff" id="sortieExec">—</pre>
+        <label>Entrée standard (stdin)</label>
+        <textarea id="copieStdin" style="min-height:80px"></textarea>
+      </div>
+    </div>
+    <div class="card" id="copieResultat"></div>
+  </section>
+
+  <!-- Correction -->
+  <section class="tabpane" id="tab-correction">
+    <div class="card">
+      <h2>Corriger la copie active contre la solution du TP</h2>
+      <p class="muted">Utilise le code de l'onglet Copie et la solution chargée dans l'onglet TP.</p>
+      <div class="row">
+        <button id="btnCorriger" class="primary">✅ Corriger</button>
+        <button id="btnVoirSolution">📘 Voir la solution</button>
+        <button id="btnCompat">🧪 Compatibilité interpréteurs</button>
+      </div>
+    </div>
+    <div class="card" id="correctionResultat"></div>
+    <div class="card" id="compatResultat" style="display:none"></div>
+  </section>
+
+  <!-- Barème -->
+  <section class="tabpane" id="tab-bareme">
+    <div class="card">
+      <h2>Profils de barème</h2>
+      <div id="baremeListe"></div>
+    </div>
+    <div class="card">
+      <h2>Éditeur JSON</h2>
+      <label>Nom du fichier (baremes/&lt;nom&gt;.json)</label>
+      <input type="text" id="baremeNom" value="mon_bareme" style="width:280px">
+      <label>Contenu JSON</label>
+      <textarea id="baremeJson" style="min-height:280px"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="btnBaremeCharger">Charger dans l'éditeur</button>
+        <button id="btnBaremeSauver" class="primary">💾 Sauver</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Classe -->
+  <section class="tabpane" id="tab-classe">
+    <div class="card">
+      <h2>Corriger un dossier de copies (Classe)</h2>
+      <label>Copies des élèves (.py, plusieurs fichiers)</label>
+      <input type="file" id="classeFichiers" accept=".py" multiple>
+      <label>Solution (optionnel si déjà chargée via TP)</label>
+      <input type="file" id="classeSolution" accept=".py">
+      <label>tests.json (optionnel)</label>
+      <input type="file" id="classeTests" accept=".json">
+      <div class="row" style="margin-top:8px">
+        <button id="btnClasseDemo">Utiliser le dossier classe/ de démo</button>
+        <button id="btnClasseCorriger" class="primary">📚 Corriger la classe</button>
+      </div>
+      <p class="muted">Chaque envoi est enregistré et visible publiquement dans l'onglet Galerie (nom, note, code, résultat).</p>
+    </div>
+    <div class="card" id="classeStats"></div>
+    <div class="card">
+      <div class="row" style="margin-bottom:8px">
+        <button id="btnExportCsv">⬇ CSV</button>
+        <button id="btnExportExcel">⬇ Excel</button>
+        <button id="btnExportAccess">⬇ SQLite (Access-compatible)</button>
+      </div>
+      <table id="classeTable">
+        <thead><tr><th data-k="nom">Fichier</th><th data-k="note">Note /20</th><th data-k="qualite">Qualité</th><th data-k="tests">Tests</th><th data-k="structure">Structure</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="card" id="classeDetail"></div>
+  </section>
+
+  <!-- BD -->
+  <section class="tabpane" id="tab-bd">
+    <div class="card">
+      <h2>Comparer des bases élèves à une base de référence</h2>
+      <label>Base(s) élève (.db / .sqlite / .accdb)</label>
+      <input type="file" id="bdFichiers" multiple>
+      <label>Base solution (.db / .sqlite / .accdb)</label>
+      <input type="file" id="bdSolution">
+      <div class="row" style="margin-top:8px">
+        <button id="btnBdDemo">Utiliser bd/ de démo (SQLite)</button>
+        <button id="btnBdComparer" class="primary">🗄 Comparer</button>
+        <button id="btnBdDiagnostic">Diagnostic pilotes</button>
+        <button id="btnBdExportExcel">⬇ Export Excel</button>
+      </div>
+      <p class="muted">.accdb : lecture réservée à Windows + moteur Access (ACE/pyodbc). SQLite (.db) fonctionne sur tout serveur, y compris Linux.</p>
+    </div>
+    <div class="card" id="bdDiag" style="display:none"></div>
+    <div class="card" id="bdStats"></div>
+    <div class="card" id="bdDetail"></div>
+  </section>
+
+  <!-- Interpréteurs -->
+  <section class="tabpane" id="tab-interp">
+    <div class="card">
+      <h2>Interpréteurs Python détectés sur le serveur</h2>
+      <button id="btnScanInterp" class="primary">⟳ Rescanner</button>
+      <table id="interpTable" style="margin-top:10px">
+        <thead><tr><th>Étiquette</th><th>Chemin</th><th>pip</th><th>PyQt5</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Galerie -->
+  <section class="tabpane" id="tab-galerie">
+    <div class="card">
+      <h2>🌐 Galerie publique</h2>
+      <p class="muted">Tout ce qui a été envoyé (Classe / BD / TP) est listé ici, visible sans connexion, pour tous les visiteurs du site.</p>
+      <div class="row">
+        <button data-gcat="classe" class="galBtn active">Classe</button>
+        <button data-gcat="bd" class="galBtn">BD</button>
+        <button data-gcat="tp" class="galBtn">TP</button>
+      </div>
+    </div>
+    <div class="card" id="galerieListe"></div>
+    <div class="card" id="galerieDetail"></div>
+  </section>
+
+  <!-- Affichage -->
+  <section class="tabpane" id="tab-affichage">
+    <div class="card">
+      <h2>Affichage</h2>
+      <label>Thème</label>
+      <select id="selTheme2">
+        <option value="light">Clair</option>
+        <option value="dark">Sombre</option>
+      </select>
+      <label>Taille de police (éditeur)</label>
+      <input type="number" id="fontSize" min="10" max="24" value="13">
+      <label>Langue de l'explication</label>
+      <select id="selLang2">
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </section>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>

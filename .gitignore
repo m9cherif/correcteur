@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+web/node_modules/
+web/tmp/
+web/data/*/files/*
+!web/data/*/files/.gitkeep

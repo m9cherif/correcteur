@@ -1,0 +1,95 @@
+{
+  "nom": "Standard",
+  "description": "Barème par défaut — TP noté ordinaire",
+  "note_max": 20.0,
+  "arrondi": 2,
+  "tolerance": 0,
+  "erreur_fatale": false,
+  "axes": {
+    "qualite": 6.0,
+    "tests": 10.0,
+    "structure": 4.0
+  },
+  "axes_bd": {
+    "tables": 4.0,
+    "champs": 4.0,
+    "donnees": 2.0,
+    "cles": 2.0,
+    "relations": 4.0,
+    "requetes": 4.0
+  },
+  "seuils": [
+    18.0,
+    16.0,
+    14.0,
+    12.0,
+    10.0
+  ],
+  "regles": {
+    "E001": {
+      "actif": true,
+      "penalite": 8.0,
+      "plafond": 8.0
+    },
+    "E002": {
+      "actif": true,
+      "penalite": 8.0,
+      "plafond": 8.0
+    },
+    "E102": {
+      "actif": true,
+      "penalite": 3.0,
+      "plafond": 6.0
+    },
+    "E104": {
+      "actif": true,
+      "penalite": 3.0,
+      "plafond": 6.0
+    },
+    "E108": {
+      "actif": true,
+      "penalite": 2.0,
+      "plafond": 4.0
+    },
+    "W101": {
+      "actif": true,
+      "penalite": 1.5,
+      "plafond": 4.5
+    },
+    "W110": {
+      "actif": true,
+      "penalite": 1.5,
+      "plafond": 4.5
+    },
+    "W103": {
+      "actif": true,
+      "penalite": 1.0,
+      "plafond": 3.0
+    },
+    "W105": {
+      "actif": true,
+      "penalite": 1.0,
+      "plafond": 3.0
+    },
+    "W106": {
+      "actif": true,
+      "penalite": 1.0,
+      "plafond": 3.0
+    },
+    "W111": {
+      "actif": true,
+      "penalite": 1.0,
+      "plafond": 3.0
+    },
+    "W107": {
+      "actif": true,
+      "penalite": 0.5,
+      "plafond": 2.0
+    },
+    "W109": {
+      "actif": true,
+      "penalite": 0.25,
+      "plafond": 2.0
+    }
+  }
+}

@@ -1,0 +1,25 @@
+TP Base de données — Gestion des notes d'un établissement
+=========================================================
+Créer une base (Access ou SQLite) contenant :
+
+TABLES
+  Eleve   (IdEleve  NuméroAuto/Entier, clé primaire
+           Nom      Texte 40, obligatoire
+           Prenom   Texte 40
+           DateNaiss Date
+           Classe   Texte 10)
+  Matiere (IdMatiere clé primaire, Libelle Texte 30 obligatoire,
+           Coefficient Entier)
+  Note    (IdNote clé primaire, IdEleve, IdMatiere,
+           Valeur Réel, DateEval Date)
+
+RELATIONS (avec intégrité référentielle)
+  Note.IdEleve   → Eleve.IdEleve
+  Note.IdMatiere → Matiere.IdMatiere
+
+DONNÉES  : 3 élèves, 3 matières, 6 notes (voir feuille distribuée)
+
+REQUÊTES
+  R1_MoyenneParEleve   : nom, prénom et moyenne de chaque élève
+  R2_ElevesEnEchec     : élèves dont la moyenne est strictement inférieure à 10
+  R3_NotesInformatique : nom de l'élève et note, pour la matière Informatique

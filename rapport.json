@@ -1,0 +1,167 @@
+{
+  "note": 15.71,
+  "qualite": 4.05,
+  "tests": 8.33,
+  "structure": 3.33,
+  "detail_qualite": [
+    [
+      "E102",
+      "وسيط افتراضي قابل للتغيير (liste=[])",
+      1,
+      3.0,
+      3.0,
+      6.0
+    ],
+    [
+      "W101",
+      "except: بدون تحديد نوع الاستثناء",
+      1,
+      1.5,
+      1.5,
+      4.5
+    ],
+    [
+      "W103",
+      "مقارنة None بـ == بدل is",
+      1,
+      1.0,
+      1.0,
+      3.0
+    ],
+    [
+      "W107",
+      "استيراد غير مستعمل",
+      2,
+      0.5,
+      1.0,
+      2.0
+    ]
+  ],
+  "resultats": [
+    {
+      "nom": "moyenne([12,15,9])",
+      "reussi": true,
+      "attendu": "12.0",
+      "obtenu": "12.0"
+    },
+    {
+      "nom": "moyenne([]) — liste vide",
+      "reussi": false,
+      "attendu": "0",
+      "obtenu": "⛔ ZeroDivisionError: division by zero"
+    },
+    {
+      "nom": "mention(17)",
+      "reussi": true,
+      "attendu": "'Excellent'",
+      "obtenu": "'Excellent'"
+    },
+    {
+      "nom": "mention(9.5)",
+      "reussi": true,
+      "attendu": "'Insuffisant'",
+      "obtenu": "'Insuffisant'"
+    },
+    {
+      "nom": "admis([8,9], 10)",
+      "reussi": true,
+      "attendu": "False",
+      "obtenu": "False"
+    },
+    {
+      "nom": "admis([14,16], 10)",
+      "reussi": true,
+      "attendu": "True",
+      "obtenu": "True"
+    }
+  ],
+  "remarques": [
+    "⚠️ 'admis': عدد الوسائط 3 بدل 2."
+  ],
+  "diff": [
+    "--- محاولة التلميذ",
+    "+++ الحلّ النموذجي",
+    "@@ -1,20 +1,18 @@",
+    "-import os",
+    "-import math",
+    "-",
+    " def moyenne(notes):",
+    "+    if not notes:",
+    "+        return 0",
+    "     return sum(notes) / len(notes)",
+    " ",
+    "+",
+    " def mention(moy):",
+    "-    if moy == None:",
+    "-        return \"Insuffisant\"",
+    "-    if moy >= 16: return \"Excellent\"",
+    "-    elif moy >= 14: return \"Bien\"",
+    "-    elif moy >= 10: return \"Passable\"",
+    "-    else: return \"Insuffisant\"",
+    "+    if moy >= 16:",
+    "+        return \"Excellent\"",
+    "+    if moy >= 14:",
+    "+        return \"Bien\"",
+    "+    if moy >= 10:",
+    "+        return \"Passable\"",
+    "+    return \"Insuffisant\"",
+    " ",
+    "-def admis(notes, seuil=10, historique=[]):",
+    "-    historique.append(notes)",
+    "-    try:",
+    "-        return moyenne(notes) >= seuil",
+    "-    except:",
+    "-        pass",
+    "+",
+    "+def admis(notes, seuil=10):",
+    "+    return moyenne(notes) >= seuil"
+  ],
+  "solution": "def moyenne(notes):\n    if not notes:\n        return 0\n    return sum(notes) / len(notes)\n\n\ndef mention(moy):\n    if moy >= 16:\n        return \"Excellent\"\n    if moy >= 14:\n        return \"Bien\"\n    if moy >= 10:\n        return \"Passable\"\n    return \"Insuffisant\"\n\n\ndef admis(notes, seuil=10):\n    return moyenne(notes) >= seuil\n",
+  "problemes": [
+    {
+      "ligne": 8,
+      "code": "W103",
+      "message": "مقارنة None بـ '=='",
+      "explication": "None كائن وحيد، والمقارنة بالهوية أدقّ وأسرع ولا تتأثّر بإعادة تعريف __eq__.",
+      "correction": "استعمل 'is None' بدل '== None'.",
+      "ligne_corrigee": "    if moy is None:",
+      "gravite": "avertissement"
+    },
+    {
+      "ligne": 15,
+      "code": "E102",
+      "message": "وسيط افتراضي قابل للتغيير في الدالة 'admis'",
+      "explication": "القيمة الافتراضية تُنشأ مرّة واحدة فقط، فتتراكم البيانات بين الاستدعاءات وتُنتج نتائج غير متوقّعة.",
+      "correction": "استعمل None كقيمة افتراضية: def f(x=None): x = [] if x is None else x",
+      "ligne_corrigee": null,
+      "gravite": "erreur"
+    },
+    {
+      "ligne": 19,
+      "code": "W101",
+      "message": "استعمال 'except:' بدون تحديد نوع الاستثناء",
+      "explication": "يلتقط حتى KeyboardInterrupt و SystemExit ويُخفي الأخطاء الحقيقية.",
+      "correction": "حدّد النوع، مثلاً: except Exception as e:",
+      "ligne_corrigee": "    except Exception as e:",
+      "gravite": "avertissement"
+    },
+    {
+      "ligne": 1,
+      "code": "W107",
+      "message": "استيراد غير مستعمل: 'os'",
+      "explication": "يُثقل الملف ويُبطئ الإقلاع دون فائدة.",
+      "correction": "احذف استيراد 'os' أو استعمله.",
+      "ligne_corrigee": null,
+      "gravite": "avertissement"
+    },
+    {
+      "ligne": 2,
+      "code": "W107",
+      "message": "استيراد غير مستعمل: 'math'",
+      "explication": "يُثقل الملف ويُبطئ الإقلاع دون فائدة.",
+      "correction": "احذف استيراد 'math' أو استعمله.",
+      "ligne_corrigee": null,
+      "gravite": "avertissement"
+    }
+  ]
+}

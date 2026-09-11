@@ -1,0 +1,319 @@
+{
+  "nom": "Évaluation Access - résultats et structure",
+  "version": "2.0",
+  "description": "Évaluation automatique d'une base Microsoft Access par comparaison avec une base solution.",
+
+  "note": {
+    "min": 0.0,
+    "max": 20.0,
+    "arrondi": 2,
+    "mode": "points"
+  },
+
+  "tolerance": {
+    "active": false,
+    "valeur": 0
+  },
+
+  "erreur_fatale": false,
+
+  "ponderation": {
+    "base_de_donnees": 20.0
+  },
+
+  "axes_bd": {
+    "tables": {
+      "points": 4.0,
+      "obligatoire": true,
+      "methode": "comparaison"
+    },
+
+    "champs": {
+      "points": 4.0,
+      "obligatoire": true,
+      "methode": "comparaison"
+    },
+
+    "types_champs": {
+      "points": 2.0,
+      "obligatoire": false,
+      "methode": "comparaison"
+    },
+
+    "cles_primaires": {
+      "points": 2.0,
+      "obligatoire": true,
+      "methode": "comparaison"
+    },
+
+    "relations": {
+      "points": 4.0,
+      "obligatoire": true,
+      "methode": "comparaison"
+    },
+
+    "requetes": {
+      "points": 4.0,
+      "obligatoire": false,
+      "methode": "comparaison"
+    }
+  },
+
+  "donnees": {
+    "active": true,
+    "points": 2.0,
+    "methode": "optionnelle",
+    "comparer": {
+      "nombre_enregistrements": true,
+      "valeurs": true
+    }
+  },
+
+  "comparaison": {
+
+    "tables": {
+      "ignorer_systeme": true,
+      "sensible_casse": false,
+      "ordre_indifferent": true
+    },
+
+    "champs": {
+      "ordre_indifferent": true,
+      "sensible_casse": false,
+      "verifier_nom": true,
+      "verifier_type": true,
+      "verifier_taille": true,
+      "verifier_obligatoire": true,
+      "verifier_valeur_defaut": false
+    },
+
+    "cles": {
+      "verifier_cle_primaire": true,
+      "verifier_composition": true,
+      "ordre_indifferent": false
+    },
+
+    "relations": {
+      "verifier_table_source": true,
+      "verifier_champ_source": true,
+      "verifier_table_cible": true,
+      "verifier_champ_cible": true,
+      "verifier_integrite_referentielle": true,
+      "ordre_indifferent": true
+    },
+
+    "requetes": {
+      "verifier_nom": true,
+      "verifier_sql": true,
+      "normaliser_espaces": true,
+      "ignorer_casse_sql": true,
+      "ordre_indifferent": true
+    }
+  },
+
+  "calcul": {
+
+    "tables": {
+      "points_par_element": true,
+      "repartition": "proportionnelle"
+    },
+
+    "champs": {
+      "repartition": "proportionnelle"
+    },
+
+    "types_champs": {
+      "repartition": "proportionnelle"
+    },
+
+    "cles_primaires": {
+      "repartition": "proportionnelle"
+    },
+
+    "relations": {
+      "repartition": "proportionnelle"
+    },
+
+    "requetes": {
+      "repartition": "proportionnelle"
+    },
+
+    "note_finale": "somme_axes"
+  },
+
+  "regles": {
+
+    "E001": {
+      "actif": true,
+      "description": "Table obligatoire absente",
+      "penalite": 8.0,
+      "plafond": 8.0,
+      "cumulable": true
+    },
+
+    "E002": {
+      "actif": true,
+      "description": "Table supplémentaire ou incorrecte",
+      "penalite": 4.0,
+      "plafond": 8.0,
+      "cumulable": true
+    },
+
+    "E102": {
+      "actif": true,
+      "description": "Champ obligatoire absent",
+      "penalite": 3.0,
+      "plafond": 6.0,
+      "cumulable": true
+    },
+
+    "E104": {
+      "actif": true,
+      "description": "Type de champ incorrect",
+      "penalite": 2.0,
+      "plafond": 6.0,
+      "cumulable": true
+    },
+
+    "E108": {
+      "actif": true,
+      "description": "Clé primaire incorrecte ou absente",
+      "penalite": 2.0,
+      "plafond": 4.0,
+      "cumulable": true
+    },
+
+    "E110": {
+      "actif": true,
+      "description": "Relation obligatoire absente",
+      "penalite": 4.0,
+      "plafond": 8.0,
+      "cumulable": true
+    },
+
+    "E111": {
+      "actif": true,
+      "description": "Relation incorrecte",
+      "penalite": 2.0,
+      "plafond": 6.0,
+      "cumulable": true
+    },
+
+    "E120": {
+      "actif": true,
+      "description": "Requête obligatoire absente",
+      "penalite": 4.0,
+      "plafond": 8.0,
+      "cumulable": true
+    },
+
+    "E121": {
+      "actif": true,
+      "description": "SQL de requête incorrect",
+      "penalite": 3.0,
+      "plafond": 6.0,
+      "cumulable": true
+    },
+
+    "W101": {
+      "actif": false,
+      "description": "Champ supplémentaire",
+      "penalite": 1.5,
+      "plafond": 4.5,
+      "cumulable": true
+    },
+
+    "W103": {
+      "actif": false,
+      "description": "Type de champ différent mais compatible",
+      "penalite": 1.0,
+      "plafond": 3.0,
+      "cumulable": true
+    },
+
+    "W105": {
+      "actif": false,
+      "description": "Valeur par défaut différente",
+      "penalite": 1.0,
+      "plafond": 3.0,
+      "cumulable": true
+    },
+
+    "W106": {
+      "actif": false,
+      "description": "Propriété de champ différente",
+      "penalite": 1.0,
+      "plafond": 3.0,
+      "cumulable": true
+    },
+
+    "W107": {
+      "actif": false,
+      "description": "Relation supplémentaire",
+      "penalite": 0.5,
+      "plafond": 2.0,
+      "cumulable": true
+    },
+
+    "W109": {
+      "actif": false,
+      "description": "Différence mineure dans une requête",
+      "penalite": 0.25,
+      "plafond": 2.0,
+      "cumulable": true
+    },
+
+    "W110": {
+      "actif": false,
+      "description": "Ordre différent des éléments",
+      "penalite": 0.5,
+      "plafond": 2.0,
+      "cumulable": false
+    },
+
+    "W111": {
+      "actif": false,
+      "description": "Nom différent mais élément équivalent",
+      "penalite": 1.0,
+      "plafond": 3.0,
+      "cumulable": true
+    }
+  },
+
+  "seuils": {
+    "excellent": {
+      "minimum": 18,
+      "mention": "Excellent"
+    },
+    "tres_bien": {
+      "minimum": 16,
+      "mention": "Très bien"
+    },
+    "bien": {
+      "minimum": 14,
+      "mention": "Bien"
+    },
+    "passable": {
+      "minimum": 12,
+      "mention": "Passable"
+    },
+    "insuffisant": {
+      "minimum": 10,
+      "mention": "Insuffisant"
+    },
+    "echec": {
+      "minimum": 0,
+      "mention": "Échec"
+    }
+  },
+
+  "rapport": {
+    "afficher_note_finale": true,
+    "afficher_detail_axes": true,
+    "afficher_erreurs": true,
+    "afficher_avertissements": true,
+    "afficher_elements_manquants": true,
+    "afficher_elements_supplementaires": true,
+    "afficher_comparaison": true
+  }
+}
