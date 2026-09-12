@@ -156,7 +156,13 @@
     <div class="card">
       <h2>Comparer des bases élèves à une base de référence</h2>
       <label>Base(s) élève (.db / .sqlite / .accdb)</label>
-      <input type="file" id="bdFichiers" multiple>
+      <div class="row">
+        <input type="file" id="bdFichiers" multiple accept=".db,.sqlite,.sqlite3,.accdb,.mdb">
+        <button type="button" id="btnBdDossier">📁 Choisir un dossier</button>
+      </div>
+      <input type="file" id="bdDossierInput" webkitdirectory multiple style="display:none">
+      <div id="bdDropzone" class="dropzone">⬇ ou glissez-déposez ici un dossier entier (ou plusieurs fichiers .db / .sqlite / .accdb)</div>
+      <div class="muted" id="bdEleveResume"></div>
       <label>Base solution (.db / .sqlite / .accdb)</label>
       <input type="file" id="bdSolution">
       <div class="row" style="margin-top:8px">

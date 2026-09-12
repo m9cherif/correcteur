@@ -54,6 +54,11 @@ pre.diff{background:var(--code-bg);color:var(--code-fg);padding:10px;border-radi
 .muted{color:var(--muted)}
 .gallery-item{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px}
 .gallery-item .fname{font-size:12px;color:var(--muted)}
+.dropzone{border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;
+  color:var(--muted);font-size:13px;margin-top:8px;cursor:pointer;transition:border-color .15s,background .15s}
+.dropzone.drag{border-color:var(--accent);background:var(--bg)}
+.file-resume{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.file-resume button{font-size:11px;padding:2px 8px}
 @media print{
   header,nav.tabs,.no-print{display:none!important}
   body{background:#fff;color:#000}

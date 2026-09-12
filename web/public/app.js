@@ -8,6 +8,7 @@ const state = {
   testsSource: '', testsName: '',
   baremeName: '',
   classeResultats: [],
+  bdEleveFiles: [],
 };
 
 // ---------------------------------------------------------------------------
@@ -347,16 +348,78 @@ $('#btnExportExcel').addEventListener('click', () => exportClasseFile('/api/expo
 $('#btnExportAccess').addEventListener('click', () => exportClasseFile('/api/export/access', { mode: 'sqlite' }));
 
 // ---------------------------------------------------------------------------
-// BD tab
+// BD tab — accepts individual files, a whole folder (button or drag & drop),
+// accumulating into state.bdEleveFiles so a class of 30 .accdb submissions
+// doesn't need selecting one by one.
+const BD_EXTENSIONS = ['.db', '.sqlite', '.sqlite3', '.accdb', '.mdb'];
+function estFichierBd(nom) {
+  const n = (nom || '').toLowerCase();
+  return BD_EXTENSIONS.some((ext) => n.endsWith(ext));
+}
+function ajouterFichiersBd(liste) {
+  const rejetes = [];
+  Array.from(liste || []).forEach((f) => {
+    if (!estFichierBd(f.name)) { rejetes.push(f.name); return; }
+    if (!state.bdEleveFiles.some((x) => x.name === f.name && x.size === f.size)) {
+      state.bdEleveFiles.push(f);
+    }
+  });
+  renderBdEleveResume();
+  if (rejetes.length) alert(`${rejetes.length} fichier(s) ignoré(s) (extension non reconnue) : ${rejetes.slice(0, 5).join(', ')}${rejetes.length > 5 ? '…' : ''}`);
+}
+function renderBdEleveResume() {
+  const box = $('#bdEleveResume');
+  box.innerHTML = '';
+  if (!state.bdEleveFiles.length) return;
+  const noms = state.bdEleveFiles.slice(0, 6).map((f) => f.name).join(', ') + (state.bdEleveFiles.length > 6 ? '…' : '');
+  const btnVider = el('button', { type: 'button', text: '✕ Vider' });
+  btnVider.addEventListener('click', () => { state.bdEleveFiles = []; renderBdEleveResume(); });
+  box.appendChild(el('div', { class: 'file-resume' }, [
+    el('span', { text: `${state.bdEleveFiles.length} fichier(s) sélectionné(s) : ${noms}` }),
+    btnVider,
+  ]));
+}
+// Recursively reads a dropped folder (or files) via the DataTransferItem API.
+async function fichiersDepuisDrop(dataTransfer) {
+  const items = dataTransfer.items;
+  if (!items || !items.length || !items[0].webkitGetAsEntry) {
+    return Array.from(dataTransfer.files || []);
+  }
+  const racines = Array.from(items).map((it) => it.webkitGetAsEntry()).filter(Boolean);
+  const fichiers = [];
+  async function lireEntree(entry) {
+    if (entry.isFile) {
+      fichiers.push(await new Promise((res, rej) => entry.file(res, rej)));
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      const lireLot = () => new Promise((res, rej) => reader.readEntries(res, rej));
+      let lot;
+      do { lot = await lireLot(); for (const e2 of lot) await lireEntree(e2); } while (lot.length);
+    }
+  }
+  for (const entree of racines) await lireEntree(entree);
+  return fichiers;
+}
+$('#bdFichiers').addEventListener('change', (e) => { ajouterFichiersBd(e.target.files); e.target.value = ''; });
+$('#btnBdDossier').addEventListener('click', () => $('#bdDossierInput').click());
+$('#bdDossierInput').addEventListener('change', (e) => { ajouterFichiersBd(e.target.files); e.target.value = ''; });
+const bdDropzone = $('#bdDropzone');
+bdDropzone.addEventListener('click', () => $('#bdFichiers').click());
+bdDropzone.addEventListener('dragover', (e) => { e.preventDefault(); bdDropzone.classList.add('drag'); });
+bdDropzone.addEventListener('dragleave', () => bdDropzone.classList.remove('drag'));
+bdDropzone.addEventListener('drop', async (e) => {
+  e.preventDefault(); bdDropzone.classList.remove('drag');
+  ajouterFichiersBd(await fichiersDepuisDrop(e.dataTransfer));
+});
 $('#btnBdDemo').addEventListener('click', () => {
   alert('Sélectionnez manuellement bd/eleve1_sami.db, bd/eleve2_rania.db… comme "base(s) élève" ' +
     'et bd/solution.db comme "base solution" via les sélecteurs de fichiers ci-dessus.');
 });
 $('#btnBdComparer').addEventListener('click', async () => {
-  const files = $('#bdFichiers').files, sol = $('#bdSolution').files[0];
+  const files = state.bdEleveFiles, sol = $('#bdSolution').files[0];
   if (!files.length || !sol) return alert('Choisissez base(s) élève et base solution.');
   const fd = new FormData();
-  Array.from(files).forEach((f) => fd.append('fichiers', f));
+  files.forEach((f) => fd.append('fichiers', f));
   fd.append('solution', sol); fd.append('lang', state.lang);
   try {
     const d = await api('POST', '/api/bd/comparer', fd, true);
@@ -388,10 +451,10 @@ $('#btnBdDiagnostic').addEventListener('click', async () => {
   box.innerHTML = '<h3>Diagnostic pilotes</h3><pre class="diff">' + d.diagnostic + '</pre>';
 });
 $('#btnBdExportExcel').addEventListener('click', async () => {
-  const files = $('#bdFichiers').files, sol = $('#bdSolution').files[0];
+  const files = state.bdEleveFiles, sol = $('#bdSolution').files[0];
   if (!files.length || !sol) return alert('Choisissez base(s) élève et base solution.');
   const fd = new FormData();
-  Array.from(files).forEach((f) => fd.append('fichiers', f));
+  files.forEach((f) => fd.append('fichiers', f));
   fd.append('solution', sol);
   const r = await fetch('/api/bd/export/excel', { method: 'POST', body: fd });
   if (!r.ok) { const j = await r.json().catch(() => ({})); return alert(j.error || 'Erreur export'); }
