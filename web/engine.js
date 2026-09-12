@@ -21,13 +21,22 @@ const CANDIDATS_PYTHON = [
 ].filter(Boolean);
 
 function detecterPythonBin() {
+  // Sur un hôte avec plusieurs python3 installés (ex. le python3 système
+  // ET /opt/alt/python311/...), le premier qui répond à --version n'est pas
+  // forcément celui où les paquets requis (access_parser, openpyxl) ont été
+  // installés. On préfère donc, parmi ceux qui se lancent, le premier qui a
+  // aussi ces paquets ; à défaut, le premier qui se lance tout court.
+  let premierUtilisable = null;
   for (const candidat of CANDIDATS_PYTHON) {
     try {
-      const r = spawnSync(candidat, ['--version']);
-      if (!r.error && r.status === 0) return candidat;
+      const v = spawnSync(candidat, ['--version']);
+      if (v.error || v.status !== 0) continue;
+      if (!premierUtilisable) premierUtilisable = candidat;
+      const m = spawnSync(candidat, ['-c', 'import access_parser, openpyxl']);
+      if (!m.error && m.status === 0) return candidat;
     } catch (e) { /* candidat suivant */ }
   }
-  return CANDIDATS_PYTHON[0] || 'python3';
+  return premierUtilisable || CANDIDATS_PYTHON[0] || 'python3';
 }
 
 const PYTHON_BIN = detecterPythonBin();
