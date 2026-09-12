@@ -95,15 +95,23 @@ except ImportError as e:
         f"ne convient."
     ) from e
 
+# access_parser (+ its own deps construct/tabulate) reads .accdb in pure
+# Python, no Windows ACE/pyodbc needed — but hosts without shell/SSH access
+# (can't run pip) never get it installed. Vendor a copy so it's importable
+# straight from the checkout; a real pip-installed version, if present,
+# still wins since this is appended after the normal search path.
+_VENDOR_DIR = os.path.join(HERE, "vendor")
+if os.path.isdir(_VENDOR_DIR) and _VENDOR_DIR not in sys.path:
+    sys.path.append(_VENDOR_DIR)
+
 try:
     import correcteur_access as ca
 except Exception:
     ca = None
 
-# Pure-Python .accdb -> .db fallback (access_parser, no Windows ACE/pyodbc
-# needed) so Access comparison also works on a Linux server. Used only when
-# not on Windows; on Windows correcteur_access already reads .accdb natively
-# via pyodbc with full fidelity (including saved queries).
+# Pure-Python .accdb -> .db fallback. Used only when not on Windows; on
+# Windows correcteur_access already reads .accdb natively via pyodbc with
+# full fidelity (including saved queries).
 try:
     sys.path.insert(0, os.path.join(PROJECT_ROOT, "bd"))
     import convertir_accdb_en_db as accdb_conv
