@@ -27,11 +27,47 @@ import tempfile
 import traceback
 
 # ---------------------------------------------------------------------------
-# Make the parent "exemples" project directory importable.
-# PROJECT_ROOT env var lets a deployment point at a different checkout.
+# Make the parent project directory (with langues.py, analyseur.py, etc.)
+# importable. PROJECT_ROOT env var lets a deployment point at a different
+# checkout, but some hosts (e.g. Hostinger's Node app manager) redeploy
+# web/ into a fresh "hbuilds/versions/<hash>/..." directory on every build
+# and don't reliably persist custom env vars across that — so if the
+# configured/default location doesn't actually contain the project, probe
+# a short list of likely candidates instead of failing outright.
 # ---------------------------------------------------------------------------
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.environ.get("PROJECT_ROOT") or os.path.dirname(os.path.dirname(HERE))
+
+
+def _candidats_racine_projet():
+    env = os.environ.get("PROJECT_ROOT")
+    if env:
+        yield env
+    yield os.path.dirname(os.path.dirname(HERE))  # défaut : web/ et projet cousins
+
+    # Hôtes type "hbuilds/versions/<hash>/nodejs/..." : le vrai checkout
+    # (langues.py, bareme.py, ...) vit hors du dossier de build versionné,
+    # au même niveau que "hbuilds" ou dans un sous-dossier "project".
+    parties = HERE.replace("\\", "/").split("/")
+    if "hbuilds" in parties:
+        racine_domaine = "/".join(parties[:parties.index("hbuilds")])
+        if racine_domaine:
+            yield racine_domaine
+            yield os.path.join(racine_domaine, "project")
+
+
+def _resoudre_racine_projet():
+    essais = []
+    for c in _candidats_racine_projet():
+        c = os.path.normpath(c)
+        if c in essais:
+            continue
+        essais.append(c)
+        if os.path.isfile(os.path.join(c, "langues.py")):
+            return c, essais
+    return essais[0], essais
+
+
+PROJECT_ROOT, _RACINES_ESSAYEES = _resoudre_racine_projet()
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -44,11 +80,20 @@ except Exception:
     pass
 os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
-import langues            # noqa: E402
-import bareme              # noqa: E402
-import analyseur           # noqa: E402
-import correcteur          # noqa: E402
-import interpreteurs as itp  # noqa: E402
+try:
+    import langues            # noqa: E402
+    import bareme              # noqa: E402
+    import analyseur           # noqa: E402
+    import correcteur          # noqa: E402
+    import interpreteurs as itp  # noqa: E402
+except ImportError as e:
+    raise ImportError(
+        f"{e}. PROJECT_ROOT résolu à {PROJECT_ROOT!r} (contient langues.py : "
+        f"{os.path.isfile(os.path.join(PROJECT_ROOT, 'langues.py'))}). "
+        f"Racines testées : {_RACINES_ESSAYEES}. Définissez PROJECT_ROOT vers "
+        f"le dossier contenant langues.py/bareme.py/analyseur.py/... si aucune "
+        f"ne convient."
+    ) from e
 
 try:
     import correcteur_access as ca
