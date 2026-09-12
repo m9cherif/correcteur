@@ -33,6 +33,19 @@ async function api(method, url, body, isForm) {
   return data;
 }
 
+// A private link scoped to one student's row (via /api/gallery/:cat/:id/eleve/:nom),
+// safe to hand to that student since it never includes classmates' results —
+// unlike the public Galerie tab, which lists everyone's uploads.
+function boutonLienEleve(cat, entryId, nom) {
+  const btn = el('button', { type: 'button', text: '🔗 Lien élève' });
+  btn.addEventListener('click', async () => {
+    const url = `${location.origin}/resultat.html?cat=${encodeURIComponent(cat)}&id=${encodeURIComponent(entryId)}&nom=${encodeURIComponent(nom)}`;
+    try { await navigator.clipboard.writeText(url); alert('Lien copié dans le presse-papiers :\n' + url); }
+    catch (e) { prompt('Copiez ce lien à envoyer à l\'élève :', url); }
+  });
+  return btn;
+}
+
 // ---------------------------------------------------------------------------
 // Tabs
 $all('nav.tabs button').forEach((btn) => {
@@ -279,6 +292,7 @@ $('#btnClasseCorriger').addEventListener('click', async () => {
   try {
     const d = await api('POST', '/api/classe', fd, true);
     state.classeResultats = d.resultats;
+    state.classeEntryId = d.id;
     renderClasse(d);
   } catch (e) { alert(e.message); }
 });
@@ -305,6 +319,7 @@ function renderClasse(d) {
       const box = $('#classeDetail'); box.innerHTML = `<h2>${r.nom}</h2>`;
       if (!r.ok) { box.innerHTML += `<p>⛔ ${r.erreur}</p>`; return; }
       renderCorrection(box, rap);
+      if (state.classeEntryId) box.appendChild(boutonLienEleve('classe', state.classeEntryId, r.nom));
     });
     tbody.appendChild(tr);
   });
@@ -435,6 +450,7 @@ function renderBd(d) {
   d.resultats.forEach((r) => {
     const card = el('div', { class: 'card' });
     card.appendChild(el('h3', { text: r.nom + (r.ok ? ` — ${r.rapport.note} / 20 (${r.rapport.mention})` : ' — erreur') }));
+    if (d.id) card.appendChild(boutonLienEleve('bd', d.id, r.nom));
     if (!r.ok) { card.appendChild(el('p', { text: '⛔ ' + r.erreur })); box.appendChild(card); return; }
     (r.rapport.ecarts || []).forEach((ec) => {
       const div = el('div', { class: 'problem' + (ec.gravite !== 'erreur' ? ' avert' : '') });

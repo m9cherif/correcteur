@@ -271,6 +271,16 @@ for (const cat of ['classe', 'bd', 'tp']) {
     if (!entry) return res.status(404).json({ error: 'introuvable' });
     res.json(entry);
   });
+  // Scoped to one student's row within a batch run — unlike the route above,
+  // the response never includes classmates' notes/errors, so this is the
+  // link a teacher can safely hand to a single student.
+  app.get(`/api/gallery/${cat}/:id/eleve/:nom`, (req, res) => {
+    const entry = store.getEntry(cat, req.params.id);
+    const resultats = entry && entry.result && entry.result.resultats;
+    const r = Array.isArray(resultats) && resultats.find((x) => x.nom === req.params.nom);
+    if (!r) return res.status(404).json({ error: "Résultat introuvable pour cet élève." });
+    res.json({ id: entry.id, uploadedAt: entry.uploadedAt, categorie: cat, eleve: r });
+  });
   app.get(`/api/gallery/${cat}/:id/file/:relPath(*)`, (req, res) => {
     const full = store.fileOnDisk(cat, path.join(req.params.id, req.params.relPath));
     if (!full) return res.status(404).json({ error: 'fichier introuvable' });
